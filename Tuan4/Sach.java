@@ -1,92 +1,22 @@
-import java.time.Year;
-
+/*
+ * Bai tap tuan 7: Lop va Doi tuong trong Java
+ * Bai 1: Xay dung lop Sach gom 5 thuoc tinh: maSach, tieuDe, tacGia, namXuatBan, soLuong.
+ * Bai 2: Xay dung phuong thuc hienThiThongTin() de hien thi thong tin sach.
+ */
 public class Sach {
-    private String maSach;
-    private String tenSach;
-    private String tacGia;
-    private int namXuatBan;
-    private double donGia;
-    private int soLuong;
-    private String loaiSach;
+    // Bai 1: Khai bao 5 thuoc tinh cua lop Sach
+    String maSach;
+    String tieuDe;
+    String tacGia;
+    int namXuatBan;
+    int soLuong;
 
-    public Sach(String maSach, String tenSach, String tacGia, int namXuatBan,
-                double donGia, int soLuong, String loaiSach) {
-        this.maSach = maSach;
-        this.tenSach = tenSach;
-        this.tacGia = tacGia;
-        this.namXuatBan = namXuatBan;
-        this.donGia = donGia;
-        this.soLuong = soLuong;
-        this.loaiSach = loaiSach;
-    }
-
-    public String getMaSach() {
-        return maSach;
-    }
-
-    public String getTenSach() {
-        return tenSach;
-    }
-
-    public String getTacGia() {
-        return tacGia;
-    }
-
-    public int getNamXuatBan() {
-        return namXuatBan;
-    }
-
-    public double getDonGia() {
-        return donGia;
-    }
-
-    public int getSoLuong() {
-        return soLuong;
-    }
-
-    public String getLoaiSach() {
-        return loaiSach;
-    }
-
-    public boolean giaHopLe() {
-        return donGia > 0;
-    }
-
-    public boolean soLuongHopLe() {
-        return soLuong >= 0;
-    }
-
-    public boolean namXuatBanHopLe() {
-        int namHienTai = Year.now().getValue();
-        return namXuatBan >= 1 && namXuatBan <= namHienTai;
-    }
-
-    public boolean laSachHopLe() {
-        return giaHopLe() && soLuongHopLe() && namXuatBanHopLe();
-    }
-
-    public String phanLoaiGia() {
-        if (donGia < 50000) {
-            return "Sách giá thấp";
-        } else if (donGia <= 100000) {
-            // Mốc 100.000 được xếp vào mức trung bình để các khoảng giá không bị chồng lấn.
-            return "Sách giá trung bình";
-        } else if (donGia <= 200000) {
-            return "Sách giá cao";
-        } else {
-            return "Sách giá đặc biệt";
-        }
-    }
-
-    public String phanLoaiTonKho() {
-        if (soLuong == 0) {
-            return "Hết sách";
-        } else if (soLuong <= 5) {
-            return "Sắp hết";
-        } else if (soLuong <= 20) {
-            return "Còn ít";
-        } else {
-            return "Còn nhiều";
-        }
+    // Bai 2: Phuong thuc hien thi day du thong tin cua mot cuon sach
+    public void hienThiThongTin() {
+        System.out.println("Ma sach: " + maSach);
+        System.out.println("Tieu de: " + tieuDe);
+        System.out.println("Tac gia: " + tacGia);
+        System.out.println("Nam xuat ban: " + namXuatBan);
+        System.out.println("So luong: " + soLuong);
     }
 }

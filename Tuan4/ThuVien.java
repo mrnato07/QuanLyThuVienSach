@@ -1,3 +1,4 @@
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -58,29 +59,24 @@ public class ThuVien {
         scanner.close();
     }
 
-    // Cau hoi: Lam sao doi Sach thanh mot chuoi? -> Noi cac truong theo thu tu, ngan cach bang dau cham phay.
-    private static String sachThanhChuoi(Sach sach) {
-        String maSach = sach.getMaSach().replace(';', ',');
-        String tenSach = sach.getTenSach().replace(';', ',');
-        String tacGia = sach.getTacGia().replace(';', ',');
-        String loaiSach = sach.getLoaiSach().replace(';', ',');
-        return maSach + ";" + tenSach + ";" + tacGia + ";" + sach.getNamXuatBan()
-                + ";" + sach.getDonGia() + ";" + sach.getSoLuong() + ";" + loaiSach;
+    // Cau hoi: Lam sao ghep thong tin sach thanh mot chuoi? -> Noi cac truong theo thu tu, ngan cach bang dau cham phay.
+    private static String taoChuoiSach(String maSach, String tenSach, String tacGia,
+                                       int namXuatBan, double donGia, int soLuong, String loaiSach) {
+        return maSach.replace(';', ',') + ";" + tenSach.replace(';', ',') + ";"
+                + tacGia.replace(';', ',') + ";" + namXuatBan + ";"
+                + donGia + ";" + soLuong + ";" + loaiSach.replace(';', ',');
     }
 
-    // Cau hoi: Lam sao doc Sach tu chuoi? -> Tach du 7 truong va chuyen cac truong so ve kieu so.
-    private static Sach chuoiThanhSach(String chuoi) {
-        String[] thongTin = chuoi.split(";", -1);
-        return new Sach(thongTin[0], thongTin[1], thongTin[2],
-                Integer.parseInt(thongTin[3]), Double.parseDouble(thongTin[4]),
-                Integer.parseInt(thongTin[5]), thongTin[6]);
+    // Cau hoi: Lam sao tach chuoi sach? -> Tach du 7 truong bang split(";").
+    private static String[] tachChuoiSach(String chuoi) {
+        return chuoi.split(";", -1);
     }
 
     // Cau hoi: Tim ma sach nhu the nao? -> Duyet danh sach va so sanh khong phan biet hoa thuong.
     private static int timViTri(ArrayList<String> danhSachSach, String ma) {
         for (int i = 0; i < danhSachSach.size(); i++) {
-            Sach sach = chuoiThanhSach(danhSachSach.get(i));
-            if (sach.getMaSach().equalsIgnoreCase(ma)) {
+            String[] thongTin = tachChuoiSach(danhSachSach.get(i));
+            if (thongTin[0].equalsIgnoreCase(ma)) {
                 return i;
             }
         }
@@ -95,7 +91,7 @@ public class ThuVien {
             System.out.println("Ma sach da ton tai.");
             return;
         }
-        nhapThongTinSach(scanner, danhSachSach, maSach, null, -1);
+        nhapThongTinSach(scanner, danhSachSach, maSach, -1);
     }
 
     // Cau hoi: Sua sach va giu ma nhu the nao? -> Dung set tai vi tri tim duoc va giu ma cu.
@@ -111,12 +107,12 @@ public class ThuVien {
             System.out.println("Khong tim thay sach co ma " + ma + ".");
             return;
         }
-        Sach sachCu = chuoiThanhSach(danhSachSach.get(viTri));
-        nhapThongTinSach(scanner, danhSachSach, sachCu.getMaSach(), sachCu, viTri);
+        String[] thongTinCu = tachChuoiSach(danhSachSach.get(viTri));
+        nhapThongTinSach(scanner, danhSachSach, thongTinCu[0], viTri);
     }
 
     private static void nhapThongTinSach(Scanner scanner, ArrayList<String> danhSachSach,
-                                         String maSach, Sach sachCu, int viTri) {
+                                         String maSach, int viTri) {
         while (true) {
             System.out.print("Nhap ten sach: ");
             String tenSach = scanner.nextLine().replace(';', ',');
@@ -135,15 +131,15 @@ public class ThuVien {
             scanner.nextLine();
             String loaiSach = layTenLoaiSach(luaChonLoaiSach);
 
-            Sach sach = new Sach(maSach, tenSach, tacGia, namXuatBan, donGia, soLuong, loaiSach);
             System.out.println("\n===== Ket qua kiem tra =====");
-            inKetQuaKiemTra(sach);
-            if (sach.laSachHopLe()) {
+            inKetQuaKiemTra(namXuatBan, donGia, soLuong);
+            if (laSachHopLe(namXuatBan, donGia, soLuong)) {
+                String chuoiSach = taoChuoiSach(maSach, tenSach, tacGia, namXuatBan, donGia, soLuong, loaiSach);
                 if (viTri == -1) {
-                    danhSachSach.add(sachThanhChuoi(sach));
+                    danhSachSach.add(chuoiSach);
                     System.out.println("Da them sach.");
                 } else {
-                    danhSachSach.set(viTri, sachThanhChuoi(sach));
+                    danhSachSach.set(viTri, chuoiSach);
                     System.out.println("Da cap nhat sach.");
                 }
                 return;
@@ -160,7 +156,7 @@ public class ThuVien {
         }
         for (int i = 0; i < danhSachSach.size(); i++) {
             System.out.println("\n===== Sach thu " + (i + 1) + " =====");
-            hienThiThongTin(chuoiThanhSach(danhSachSach.get(i)));
+            hienThiThongTin(tachChuoiSach(danhSachSach.get(i)));
         }
     }
 
@@ -176,7 +172,7 @@ public class ThuVien {
         if (viTri == -1) {
             System.out.println("Khong tim thay sach co ma \"" + ma + "\".");
         } else {
-            hienThiThongTin(chuoiThanhSach(danhSachSach.get(viTri)));
+            hienThiThongTin(tachChuoiSach(danhSachSach.get(viTri)));
         }
     }
 
@@ -197,21 +193,29 @@ public class ThuVien {
         }
     }
 
-    // Cau hoi: In thong tin sach nhu the nao? -> Doc tung thuoc tinh va in them phan loai, tinh trang kho.
-    private static void hienThiThongTin(Sach sach) {
-        System.out.println("Ma sach: " + sach.getMaSach());
-        System.out.println("Ten sach: " + sach.getTenSach());
-        System.out.println("Tac gia: " + sach.getTacGia());
-        System.out.println("Nam xuat ban: " + sach.getNamXuatBan());
-        System.out.println("Don gia: " + sach.getDonGia() + " VND");
-        System.out.println("So luong: " + sach.getSoLuong());
-        System.out.println("Loai sach: " + sach.getLoaiSach());
-        if (sach.laSachHopLe()) {
-            double thanhTien = sach.getDonGia() * sach.getSoLuong();
+    // Cau hoi: In thong tin sach nhu the nao? -> Doc tung truong va in them phan loai, tinh trang kho.
+    private static void hienThiThongTin(String[] thongTin) {
+        String maSach = thongTin[0];
+        String tenSach = thongTin[1];
+        String tacGia = thongTin[2];
+        int namXuatBan = Integer.parseInt(thongTin[3]);
+        double donGia = Double.parseDouble(thongTin[4]);
+        int soLuong = Integer.parseInt(thongTin[5]);
+        String loaiSach = thongTin[6];
+
+        System.out.println("Ma sach: " + maSach);
+        System.out.println("Ten sach: " + tenSach);
+        System.out.println("Tac gia: " + tacGia);
+        System.out.println("Nam xuat ban: " + namXuatBan);
+        System.out.println("Don gia: " + donGia + " VND");
+        System.out.println("So luong: " + soLuong);
+        System.out.println("Loai sach: " + loaiSach);
+        if (laSachHopLe(namXuatBan, donGia, soLuong)) {
+            double thanhTien = donGia * soLuong;
             double phiVanChuyen = thanhTien * 0.05;
             double tongTienNhap = thanhTien + phiVanChuyen;
-            System.out.println("Phan loai gia: " + sach.phanLoaiGia());
-            System.out.println("Tinh trang ton kho: " + sach.phanLoaiTonKho());
+            System.out.println("Phan loai gia: " + phanLoaiGia(donGia));
+            System.out.println("Tinh trang ton kho: " + phanLoaiTonKho(soLuong));
             System.out.println("Thanh tien: " + thanhTien + " VND");
             System.out.println("Phi van chuyen: " + phiVanChuyen + " VND");
             System.out.println("Tong tien nhap: " + tongTienNhap + " VND");
@@ -226,7 +230,8 @@ public class ThuVien {
         }
         int tongSoLuong = 0;
         for (int i = 0; i < danhSachSach.size(); i++) {
-            tongSoLuong += chuoiThanhSach(danhSachSach.get(i)).getSoLuong();
+            String[] thongTin = tachChuoiSach(danhSachSach.get(i));
+            tongSoLuong += Integer.parseInt(thongTin[5]);
         }
         System.out.println("Tong so luong: " + tongSoLuong);
     }
@@ -239,8 +244,10 @@ public class ThuVien {
         }
         double tongGiaTri = 0;
         for (int i = 0; i < danhSachSach.size(); i++) {
-            Sach sach = chuoiThanhSach(danhSachSach.get(i));
-            tongGiaTri += sach.getDonGia() * sach.getSoLuong();
+            String[] thongTin = tachChuoiSach(danhSachSach.get(i));
+            double donGia = Double.parseDouble(thongTin[4]);
+            int soLuong = Integer.parseInt(thongTin[5]);
+            tongGiaTri += donGia * soLuong;
         }
         System.out.println("Tong gia tri: " + tongGiaTri + " VND");
     }
@@ -273,24 +280,65 @@ public class ThuVien {
         }
     }
 
-    // Cau hoi: Kiem tra sach the nao? -> Goi cac ham hop le trong Sach va thong bao ket qua.
-    private static void inKetQuaKiemTra(Sach sach) {
-        if (sach.giaHopLe()) {
+    private static boolean giaHopLe(double donGia) {
+        return donGia > 0;
+    }
+
+    private static boolean soLuongHopLe(int soLuong) {
+        return soLuong >= 0;
+    }
+
+    private static boolean namXuatBanHopLe(int namXuatBan) {
+        int namHienTai = Year.now().getValue();
+        return namXuatBan >= 1 && namXuatBan <= namHienTai;
+    }
+
+    private static boolean laSachHopLe(int namXuatBan, double donGia, int soLuong) {
+        return giaHopLe(donGia) && soLuongHopLe(soLuong) && namXuatBanHopLe(namXuatBan);
+    }
+
+    private static String phanLoaiGia(double donGia) {
+        if (donGia < 50000) {
+            return "Sách giá thấp";
+        } else if (donGia <= 100000) {
+            return "Sách giá trung bình";
+        } else if (donGia <= 200000) {
+            return "Sách giá cao";
+        } else {
+            return "Sách giá đặc biệt";
+        }
+    }
+
+    private static String phanLoaiTonKho(int soLuong) {
+        if (soLuong == 0) {
+            return "Hết sách";
+        } else if (soLuong <= 5) {
+            return "Sắp hết";
+        } else if (soLuong <= 20) {
+            return "Còn ít";
+        } else {
+            return "Còn nhiều";
+        }
+    }
+
+    // Cau hoi: Kiem tra sach the nao? -> Goi cac ham hop le va thong bao ket qua.
+    private static void inKetQuaKiemTra(int namXuatBan, double donGia, int soLuong) {
+        if (giaHopLe(donGia)) {
             System.out.println("Gia sach hop le.");
         } else {
             System.out.println("Gia sach khong hop le. Don gia phai lon hon 0.");
         }
-        if (sach.soLuongHopLe()) {
+        if (soLuongHopLe(soLuong)) {
             System.out.println("So luong hop le.");
         } else {
             System.out.println("So luong khong hop le. So luong phai tu 0 tro len.");
         }
-        if (sach.namXuatBanHopLe()) {
+        if (namXuatBanHopLe(namXuatBan)) {
             System.out.println("Nam xuat ban hop le.");
         } else {
             System.out.println("Nam xuat ban khong hop le.");
         }
-        if (sach.laSachHopLe()) {
+        if (laSachHopLe(namXuatBan, donGia, soLuong)) {
             System.out.println("Thong tin sach hop le.");
         } else {
             System.out.println("Thong tin sach khong hop le.");
